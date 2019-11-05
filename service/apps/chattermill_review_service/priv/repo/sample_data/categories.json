@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1218, 
+        "name": "Information"
+    }, 
+    {
+        "id": 1219, 
+        "name": "Miscellaneous"
+    }, 
+    {
+        "id": 1220, 
+        "name": "Product & Features"
+    }, 
+    {
+        "id": 1221, 
+        "name": "Security"
+    }, 
+    {
+        "id": 1222, 
+        "name": "Customer Service"
+    }, 
+    {
+        "id": 1223, 
+        "name": "App"
+    }, 
+    {
+        "id": 1224, 
+        "name": "Brand"
+    }
+]
