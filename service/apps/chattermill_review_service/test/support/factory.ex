@@ -4,12 +4,21 @@ defmodule ChattermillReviewService.Factory do
 
   alias ChattermillReviewService.{
     Reviews.Review,
+    Reviews.ThemeSentiment,
     Themes.Theme,
     Themes.Category
   }
 
   def review_factory do
     %Review{comment: "some comment"}
+  end
+
+  def theme_sentiment_factory do
+    %ThemeSentiment{
+      review: build(:review),
+      theme: build(:theme),
+      sentiment: sequence(:sentiment, [-1, 0, 1])
+    }
   end
 
   def category_factory do
