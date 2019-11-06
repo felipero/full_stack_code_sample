@@ -3,9 +3,14 @@ defmodule ChattermillReviewService.Factory do
   use ExMachina.Ecto, repo: ChattermillReviewService.Repo
 
   alias ChattermillReviewService.{
+    Reviews.Review,
     Themes.Theme,
     Themes.Category
   }
+
+  def review_factory do
+    %Review{comment: "some comment"}
+  end
 
   def category_factory do
     %Category{name: sequence(:name, &"Category #{&1}")}
