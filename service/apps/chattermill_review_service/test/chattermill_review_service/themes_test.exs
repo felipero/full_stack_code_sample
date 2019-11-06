@@ -54,4 +54,59 @@ defmodule ChattermillReviewService.ThemesTest do
       assert %Ecto.Changeset{} = Themes.change_category(category)
     end
   end
+
+  describe "themes" do
+    alias ChattermillReviewService.Themes.Theme
+
+    @update_attrs %{name: "some updated name"}
+    @invalid_attrs %{name: nil}
+
+    test "list_themes/0 returns all themes" do
+      theme = insert(:theme)
+      assert [%Theme{} = returned_theme] = Themes.list_themes()
+      assert returned_theme.id == theme.id
+      assert returned_theme.category_id == theme.category_id
+      assert returned_theme.name == theme.name
+    end
+
+    test "get_theme!/1 returns the theme with given id" do
+      theme = insert(:theme)
+      assert %Theme{} = returned_theme = Themes.get_theme!(theme.id)
+      assert returned_theme.name == theme.name
+    end
+
+    test "create_theme/1 with valid data creates a theme" do
+      assert {:ok, %Theme{} = theme} =
+               Themes.create_theme(params_with_assocs(:theme, %{name: "Theme Bar"}))
+
+      assert theme.name == "Theme Bar"
+    end
+
+    test "create_theme/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Themes.create_theme(@invalid_attrs)
+    end
+
+    test "update_theme/2 with valid data updates the theme" do
+      theme = insert(:theme)
+      assert {:ok, %Theme{} = theme} = Themes.update_theme(theme, @update_attrs)
+      assert theme.name == "some updated name"
+    end
+
+    test "update_theme/2 with invalid data returns error changeset" do
+      theme = insert(:theme)
+      assert {:error, %Ecto.Changeset{}} = Themes.update_theme(theme, @invalid_attrs)
+      assert theme.name == Themes.get_theme!(theme.id).name
+    end
+
+    test "delete_theme/1 deletes the theme" do
+      theme = insert(:theme)
+      assert {:ok, %Theme{}} = Themes.delete_theme(theme)
+      assert_raise Ecto.NoResultsError, fn -> Themes.get_theme!(theme.id) end
+    end
+
+    test "change_theme/1 returns a theme changeset" do
+      theme = insert(:theme)
+      assert %Ecto.Changeset{} = Themes.change_theme(theme)
+    end
+  end
 end

@@ -5,8 +5,12 @@ defmodule ChattermillReviewService.Themes.Category do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias ChattermillReviewService.Themes.Theme
+
   schema "categories" do
     field(:name, :string)
+
+    has_many(:themes, Theme)
 
     timestamps()
   end
