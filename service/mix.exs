@@ -5,7 +5,11 @@ defmodule ChattermillReviewService.Umbrella.MixProject do
     [
       apps_path: "apps",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases(),
+      preferred_cli_env: [
+        "start.prod": :prod
+      ]
     ]
   end
 
@@ -25,6 +29,16 @@ defmodule ChattermillReviewService.Umbrella.MixProject do
     [
       {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false},
       {:ex_machina, "~> 2.3", only: :test}
+    ]
+  end
+
+  defp aliases do
+    [
+      "start.prod": [
+        "ecto.create",
+        "ecto.migrate",
+        "phx.server"
+      ]
     ]
   end
 end
