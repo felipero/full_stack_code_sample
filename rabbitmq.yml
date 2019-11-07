@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: chattermill-rabbitmq-pod
+  labels:
+    app: chattermill
+    component: rabbitmq
+spec:
+  containers:
+    - image: rabbitmq:management
+      name: rabbitmq
+      ports:
+        - containerPort: 15672
+  dnsPolicy: ClusterFirst
+  restartPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chattermill-rabbitmq-service
+spec:
+  type: NodePort
+  ports:
+    - port: 15672
+      name: management-ui
+      protocol: TCP
+      targetPort: 15672
+      nodePort: 30002
+    - port: 5672
+      name: amqp
+      targetPort: 5672
+      nodePort: 30003
+  selector:
+    app: chattermill
+    component: rabbitmq

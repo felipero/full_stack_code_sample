@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: chattermill-postgres-pod
+  labels:
+    app: chattermill
+    component: postgres
+spec:
+  containers:
+    - image: postgres:12
+      name: postgres
+      ports:
+        - containerPort: 5432
+  dnsPolicy: ClusterFirst
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chattermill-postgres-service
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+      protocol: TCP
+      targetPort: 5432
+      nodePort: 30004
+  selector:
+    app: chattermill
+    component: postgres

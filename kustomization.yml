@@ -1,2 +1,4 @@
 resources:
   - service/api.yml
+  - rabbitmq.yml
+  - postgresql.yml
