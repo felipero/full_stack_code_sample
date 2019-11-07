@@ -5,7 +5,8 @@ config :chattermill_review_service, ChattermillReviewService.Repo,
   username: "postgres",
   password: "postgres",
   database: "chattermill_review_service_dev",
-  hostname: "localhost",
+  hostname: System.get_env("PG_HOST") || "localhost",
+  port: System.get_env("PG_PORT") || 5432,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
