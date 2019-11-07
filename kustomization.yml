@@ -1,4 +1,5 @@
 resources:
+  - dashboard/dashboard.yml
   - service/api.yml
   - rabbitmq.yml
   - postgresql.yml
