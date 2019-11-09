@@ -11,7 +11,9 @@ defmodule ChattermillReviewService.ReviewsTest do
 
     test "list_reviews/0 returns all reviews" do
       review = insert(:review)
-      assert Reviews.list_reviews() == [review]
+      insert(:theme_sentiment, review: review)
+
+      assert Reviews.list_reviews() == [Repo.preload(review, :theme_sentiments)]
     end
 
     test "get_review!/1 returns the review with given id" do

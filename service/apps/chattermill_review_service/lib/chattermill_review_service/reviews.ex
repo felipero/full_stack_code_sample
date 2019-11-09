@@ -18,7 +18,9 @@ defmodule ChattermillReviewService.Reviews do
 
   """
   def list_reviews do
-    Repo.all(Review)
+    Review
+    |> Repo.all()
+    |> Repo.preload(:theme_sentiments)
   end
 
   @doc """
