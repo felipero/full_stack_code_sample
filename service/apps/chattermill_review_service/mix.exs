@@ -39,7 +39,8 @@ defmodule ChattermillReviewService.MixProject do
       {:amqp, "~> 1.3"},
       {:ecto_sql, "~> 3.1"},
       {:postgrex, ">= 0.0.0"},
-      {:jason, "~> 1.0"}
+      {:jason, "~> 1.0"},
+      {:ex_machina, "~> 2.3", only: :test}
     ]
   end
 
