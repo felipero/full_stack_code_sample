@@ -7,9 +7,13 @@ defmodule ChattermillReviewService.Application do
 
   def start(_type, _args) do
     children = [
-      ChattermillReviewService.Repo
+      ChattermillReviewService.Repo,
+      ChattermillReviewService.ReviewAMQPWorker
     ]
 
-    Supervisor.start_link(children, strategy: :one_for_one, name: ChattermillReviewService.Supervisor)
+    Supervisor.start_link(children,
+      strategy: :one_for_one,
+      name: ChattermillReviewService.Supervisor
+    )
   end
 end

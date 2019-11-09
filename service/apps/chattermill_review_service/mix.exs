@@ -36,6 +36,7 @@ defmodule ChattermillReviewService.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:amqp, "~> 1.3"},
       {:ecto_sql, "~> 3.1"},
       {:postgrex, ">= 0.0.0"},
       {:jason, "~> 1.0"}
