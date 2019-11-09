@@ -49,7 +49,26 @@ defmodule ChattermillReviewService.Reviews do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_review(attrs \\ %{}) do
+  def create_review(attrs \\ %{})
+
+  def create_review(
+        %{
+          "id" => _id,
+          "comment" => _comment,
+          "themes" => theme_sentiments,
+          "created_at" => inserted_at
+        } = params
+      ) do
+    attrs =
+      params
+      |> Map.drop(["themes", "created_at"])
+      |> Map.put("theme_sentiments", theme_sentiments)
+      |> Map.put("inserted_at", inserted_at)
+
+    create_review(attrs)
+  end
+
+  def create_review(attrs) do
     %Review{}
     |> Review.changeset(attrs)
     |> Repo.insert()

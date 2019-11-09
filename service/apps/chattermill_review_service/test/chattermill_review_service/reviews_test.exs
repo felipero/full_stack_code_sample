@@ -3,10 +3,9 @@ defmodule ChattermillReviewService.ReviewsTest do
   import ChattermillReviewService.Factory
 
   alias ChattermillReviewService.Reviews
+  alias ChattermillReviewService.Reviews.{Review, ThemeSentiment}
 
   describe "reviews" do
-    alias ChattermillReviewService.Reviews.Review
-
     @update_attrs %{comment: "some updated comment"}
     @invalid_attrs %{comment: nil}
 
@@ -18,6 +17,26 @@ defmodule ChattermillReviewService.ReviewsTest do
     test "get_review!/1 returns the review with given id" do
       review = insert(:review)
       assert Reviews.get_review!(review.id) == review
+    end
+
+    test "create_review/1 with valid data containing themes key creates a review" do
+      insert(:theme, id: 6373)
+
+      attrs = %{
+        "comment" => "excellent",
+        "themes" => [
+          %{
+            "theme_id" => 6373,
+            "sentiment" => 1
+          }
+        ],
+        "created_at" => "2019-07-18T23:28:36.000Z",
+        "id" => 59_458_292
+      }
+
+      assert {:ok, %Review{} = review} = Reviews.create_review(attrs)
+      assert review.comment == "excellent"
+      assert [%ThemeSentiment{theme_id: 6373}] = review.theme_sentiments
     end
 
     test "create_review/1 with valid data creates a review" do
@@ -54,8 +73,6 @@ defmodule ChattermillReviewService.ReviewsTest do
   end
 
   describe "theme_sentiments" do
-    alias ChattermillReviewService.Reviews.ThemeSentiment
-
     @update_attrs params_for(:theme_sentiment, %{sentiment: 0})
     @invalid_attrs %{review_id: nil, theme_id: nil, sentiment: nil}
 
@@ -100,8 +117,7 @@ defmodule ChattermillReviewService.ReviewsTest do
               %Ecto.Changeset{
                 errors: [
                   sentiment: {"can't be blank", [validation: :required]},
-                  theme_id: {"can't be blank", [validation: :required]},
-                  review_id: {"can't be blank", [validation: :required]}
+                  theme_id: {"can't be blank", [validation: :required]}
                 ]
               }} = Reviews.create_theme_sentiment(@invalid_attrs)
     end
