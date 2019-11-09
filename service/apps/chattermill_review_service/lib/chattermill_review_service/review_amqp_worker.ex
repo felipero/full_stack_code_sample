@@ -5,8 +5,32 @@ defmodule ChattermillReviewService.ReviewAMQPWorker do
   alias AMQP.{Connection, Channel, Queue, Basic}
   alias ChattermillReviewService.Reviews
 
-  def start_link(opts \\ [name: __MODULE__]) do
+  def start_link(opts \\ []) do
+    opts = Keyword.put(opts, :name, __MODULE__)
     GenServer.start_link(__MODULE__, nil, opts)
+  end
+
+  def publish_review(attrs) do
+    case GenServer.call(__MODULE__, {:publish_review, Jason.encode!(attrs)}) do
+      {:ok, payload} ->
+        {:ok, payload}
+
+      {:error, reason, payload} ->
+        Logger.error("Failed to publish message with payload: #{payload}. Reason:#{reason}")
+    end
+  end
+
+  # Publishing a new review message got from the call made on publish_review/1
+  def handle_call({:publish_review, payload}, _from, channel) do
+    {_, _, queue_name, _} = connection_config()
+
+    case AMQP.Basic.publish(channel, "", queue_name, payload, mandatory: true, persistent: true) do
+      :ok ->
+        {:reply, {:ok, payload}, channel}
+
+      {:error, reason} ->
+        {:reply, {:error, reason, payload}, channel}
+    end
   end
 
   def init(_) do

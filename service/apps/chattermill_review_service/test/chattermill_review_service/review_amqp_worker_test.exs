@@ -1,12 +1,39 @@
 defmodule ChattermillReviewService.ReviewAMQPWorkerTest do
   use ChattermillReviewService.DataCase, async: false
+  # use ExUnit.Case, async: true
   import ChattermillReviewService.Factory
 
   alias ChattermillReviewService.{ReviewAMQPWorker, Reviews}
 
   setup_all do
     System.put_env("AMQP_QUEUE", "chattermill_review_test")
+
     on_exit(fn -> System.delete_env("AMQP_QUEUE") end)
+  end
+
+  describe "publish_review/1" do
+    test "returns the encoded message when valid data" do
+      insert(:theme, id: 6194)
+
+      attrs = %{
+        comment: "excellent message published",
+        themes: [
+          %{
+            theme_id: 6194,
+            sentiment: 0
+          }
+        ],
+        created_at: "2019-07-18T23:28:36.000Z",
+        id: 53_451_294
+      }
+
+      start_supervised!(ReviewAMQPWorker)
+      assert {:ok, Jason.encode!(attrs)} == ReviewAMQPWorker.publish_review(attrs)
+      Process.sleep(50)
+
+      assert %{id: 53_451_294, comment: "excellent message published"} =
+               Reviews.get_review!(53_451_294)
+    end
   end
 
   describe "handle_continue/2" do
@@ -99,7 +126,6 @@ defmodule ChattermillReviewService.ReviewAMQPWorkerTest do
 
     test "results in no messages in the queue", %{channel: channel, queue_name: queue_name} do
       AMQP.Queue.purge(channel, queue_name)
-
       insert(:theme, id: 6372)
 
       message =
@@ -125,14 +151,11 @@ defmodule ChattermillReviewService.ReviewAMQPWorkerTest do
                  persistent: false
                )
 
-      Process.sleep(50)
-      assert 1 == AMQP.Queue.message_count(channel, queue_name)
-      id = start_supervised!(ReviewAMQPWorker)
+      start_supervised!(ReviewAMQPWorker)
       Process.sleep(50)
 
       assert %{id: 59_458_292} = Reviews.get_review!(59_458_292)
 
-      stop_supervised(id)
       assert AMQP.Queue.empty?(channel, queue_name)
       assert {:ok, %{message_count: 0}} = AMQP.Queue.delete(channel, "chattermill_review_test")
     end
