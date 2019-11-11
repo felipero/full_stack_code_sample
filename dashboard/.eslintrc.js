@@ -9,7 +9,6 @@ module.exports = {
     'comma-dangle': ['error', 'always-multiline'],
     'max-len': ['error', { code: 150 }],
     'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    'no-unused-modules': ['error', { argsIgnorePattern: '^_' }],
   },
   plugins: ['prettier', 'react'],
   parserOptions: {
