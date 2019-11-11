@@ -14,12 +14,11 @@ defmodule ChattermillReviewService.Seed do
   end
 
   def each_from_json_file(path, function) do
-    attrs =
-      __DIR__
-      |> Path.join(path)
-      |> File.read!()
-      |> Jason.decode!()
-      |> Enum.each(function)
+    __DIR__
+    |> Path.join(path)
+    |> File.read!()
+    |> Jason.decode!()
+    |> Enum.each(function)
   end
 
   def create_review(
