@@ -1,6 +1,5 @@
 defmodule ChattermillReviewService.ReviewAMQPWorkerTest do
   use ChattermillReviewService.DataCase, async: false
-  # use ExUnit.Case, async: true
   import ChattermillReviewService.Factory
 
   alias ChattermillReviewService.{ReviewAMQPWorker, Reviews}
@@ -13,6 +12,8 @@ defmodule ChattermillReviewService.ReviewAMQPWorkerTest do
 
   describe "publish_review/1" do
     test "returns the encoded message when valid data" do
+      {:noreply, channel} = ReviewAMQPWorker.handle_continue(:connect, nil)
+
       insert(:theme, id: 6194)
 
       attrs = %{
@@ -27,12 +28,19 @@ defmodule ChattermillReviewService.ReviewAMQPWorkerTest do
         id: 53_451_294
       }
 
-      start_supervised!(ReviewAMQPWorker)
       assert {:ok, Jason.encode!(attrs)} == ReviewAMQPWorker.publish_review(attrs)
-      Process.sleep(50)
 
-      assert %{id: 53_451_294, comment: "excellent message published"} =
-               Reviews.get_review!(53_451_294)
+      assert AMQP.Queue.empty?(channel, "chattermill_review_test")
+    end
+
+    test "returns error with reason when invalid data" do
+      Logger.remove_backend(:console)
+      on_exit(fn -> Logger.add_backend(:console) end)
+
+      start_supervised(ReviewAMQPWorker)
+
+      assert {:error, "invalid byte 0xFF in <<255>>", <<255>>} ==
+               ReviewAMQPWorker.publish_review("\xFF")
     end
   end
 
@@ -91,14 +99,29 @@ defmodule ChattermillReviewService.ReviewAMQPWorkerTest do
     end
 
     test "handling :basic_deliver message returns the channel" do
+      insert(:theme, id: 6194)
       {:noreply, channel} = ReviewAMQPWorker.handle_continue(:connect, nil)
+
+      attrs = %{
+        comment: "excellent message published",
+        themes: [
+          %{
+            theme_id: 6194,
+            sentiment: 0
+          }
+        ],
+        created_at: "2019-07-18T23:28:36.000Z",
+        id: 53_451_294
+      }
 
       assert {:noreply, channel} ==
                ReviewAMQPWorker.handle_info(
-                 {:basic_deliver, Jason.encode!(%{id: "My message content"}),
-                  %{delivery_tag: 1, redelivered: false}},
+                 {:basic_deliver, Jason.encode!(attrs), %{delivery_tag: 1, redelivered: false}},
                  channel
                )
+
+      assert %{id: 53_451_294, comment: "excellent message published"} =
+               Reviews.get_review!(53_451_294)
     end
 
     test "handling :basic_deliver with invalid message returns the channel" do
@@ -110,54 +133,6 @@ defmodule ChattermillReviewService.ReviewAMQPWorkerTest do
                   %{delivery_tag: 1, redelivered: false}},
                  channel
                )
-    end
-  end
-
-  describe "handling a real message on amqp queue" do
-    setup do
-      host = System.get_env("AMQP_HOST", "localhost")
-      port = String.to_integer(System.get_env("AMQP_PORT", "30003"))
-      queue_name = System.get_env("AMQP_QUEUE", "chattermill_review_test")
-      {:ok, connection} = AMQP.Connection.open(host: host, port: port)
-      {:ok, channel} = AMQP.Channel.open(connection)
-      AMQP.Queue.declare(channel, queue_name, durable: true)
-      %{channel: channel, queue_name: queue_name}
-    end
-
-    test "results in no messages in the queue", %{channel: channel, queue_name: queue_name} do
-      AMQP.Queue.purge(channel, queue_name)
-      insert(:theme, id: 6372)
-
-      message =
-        Jason.encode!(%{
-          comment: "excellent",
-          themes: [
-            %{
-              theme_id: 6372,
-              sentiment: 1
-            }
-          ],
-          created_at: "2019-07-18T23:28:36.000Z",
-          id: 59_458_292
-        })
-
-      assert :ok =
-               AMQP.Basic.publish(
-                 channel,
-                 "",
-                 queue_name,
-                 message,
-                 mandatory: true,
-                 persistent: false
-               )
-
-      start_supervised!(ReviewAMQPWorker)
-      Process.sleep(50)
-
-      assert %{id: 59_458_292} = Reviews.get_review!(59_458_292)
-
-      assert AMQP.Queue.empty?(channel, queue_name)
-      assert {:ok, %{message_count: 0}} = AMQP.Queue.delete(channel, "chattermill_review_test")
     end
   end
 end

@@ -18,6 +18,11 @@ defmodule ChattermillReviewService.ReviewAMQPWorker do
       {:error, reason, payload} ->
         Logger.error("Failed to publish message with payload: #{payload}. Reason:#{reason}")
     end
+  rescue
+    exception ->
+      Logger.error("Error receiving the message to publish review.")
+      Logger.error(Exception.message(exception))
+      {:error, exception.message, attrs}
   end
 
   # Publishing a new review message got from the call made on publish_review/1
@@ -95,14 +100,7 @@ defmodule ChattermillReviewService.ReviewAMQPWorker do
     exception ->
       :ok = Basic.reject(channel, tag, requeue: not redelivered)
       Logger.error("Error receiving the message with payload: #{payload}")
-
-      case exception do
-        Jason.DecodeError ->
-          Logger.error(Jason.DecodeError.message(exception))
-
-        _ ->
-          Logger.error(Exception.message(exception))
-      end
+      Logger.error(Exception.message(exception))
   end
 
   defp connection_config do
