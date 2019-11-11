@@ -1,5 +1,5 @@
 defmodule ChattermillReviewServiceWeb.ReviewControllerTest do
-  use ChattermillReviewServiceWeb.ConnCase
+  use ChattermillReviewServiceWeb.ConnCase, async: false
   import ChattermillReviewService.Factory
 
   setup %{conn: conn} do
@@ -46,7 +46,9 @@ defmodule ChattermillReviewServiceWeb.ReviewControllerTest do
     test "renders review when data is valid", %{conn: conn} do
       insert(:theme, id: 6427)
       conn = post(conn, Routes.review_path(conn, :create), review: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      assert "ok" = json_response(conn, 202)
+
+      Process.sleep(10)
 
       conn = get(conn, Routes.review_path(conn, :index))
 
@@ -59,21 +61,61 @@ defmodule ChattermillReviewServiceWeb.ReviewControllerTest do
              ] = json_response(conn, 200)["data"]
     end
 
-    @invalid_attrs %{
-      id: 1,
-      comment: "",
+    @invalid_review_attrs %{
+      comment: "some review",
       created_at: nil,
       themes: [%{theme_id: 1200, sentiment: nil}]
     }
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.review_path(conn, :create), review: @invalid_attrs)
+    test "renders errors when review is not with all fields", %{conn: conn} do
+      Logger.remove_backend(:console)
+      on_exit(fn -> Logger.add_backend(:console) end)
+      conn = post(conn, Routes.review_path(conn, :create), review: @invalid_review_attrs)
 
       assert %{
                "errors" => %{
-                 "comment" => ["can't be blank"],
-                 "theme_sentiments" => [%{"sentiment" => ["can't be blank"]}]
+                 "reason" => "Invalid data. Review does not meet the required format."
                }
-             } = json_response(conn, 422)
+             } ==
+               json_response(conn, 422)
+    end
+
+    @invalid_themes_attrs %{
+      id: 1,
+      comment: "My comment",
+      created_at: nil,
+      themes: [%{theme_id: 1200, sentiment: nil}, %{}]
+    }
+    test "renders errors when themes are not inthe valid format", %{conn: conn} do
+      Logger.remove_backend(:console)
+      on_exit(fn -> Logger.add_backend(:console) end)
+      conn = post(conn, Routes.review_path(conn, :create), review: @invalid_themes_attrs)
+
+      assert %{
+               "errors" => %{
+                 "reason" => "Invalid data. Themes field does not match the required format."
+               }
+             } ==
+               json_response(conn, 422)
+    end
+
+    @invalid_char_attrs %{
+      id: 1,
+      comment: "sdf \xFF sd",
+      created_at: nil,
+      themes: [%{theme_id: 1200, sentiment: nil}]
+    }
+    test "renders errors when data can't be encoded to json invalid", %{conn: conn} do
+      Logger.remove_backend(:console)
+      on_exit(fn -> Logger.add_backend(:console) end)
+      conn = post(conn, Routes.review_path(conn, :create), review: @invalid_char_attrs)
+
+      assert %{
+               "errors" => %{
+                 "reason" =>
+                   "Invalid data. invalid byte 0xFF in <<115, 100, 102, 32, 255, 32, 115, 100>>."
+               }
+             } ==
+               json_response(conn, 422)
     end
   end
 end
