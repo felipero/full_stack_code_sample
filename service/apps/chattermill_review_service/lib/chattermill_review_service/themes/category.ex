@@ -18,7 +18,7 @@ defmodule ChattermillReviewService.Themes.Category do
   @doc false
   def changeset(category, attrs) do
     category
-    |> cast(attrs, [:name])
+    |> cast(attrs, [:id, :name])
     |> validate_required([:name])
   end
 end

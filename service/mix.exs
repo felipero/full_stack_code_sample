@@ -36,6 +36,7 @@ defmodule ChattermillReviewService.Umbrella.MixProject do
       "start.prod": [
         "ecto.create",
         "ecto.migrate",
+        "run apps/chattermill_review_service/priv/repo/seeds.exs",
         "phx.server"
       ]
     ]

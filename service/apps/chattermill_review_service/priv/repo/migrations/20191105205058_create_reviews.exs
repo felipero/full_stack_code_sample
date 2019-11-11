@@ -3,10 +3,9 @@ defmodule ChattermillReviewService.Repo.Migrations.CreateReviews do
 
   def change do
     create table(:reviews) do
-      add :comment, :string
+      add(:comment, :text)
 
       timestamps()
     end
-
   end
 end
