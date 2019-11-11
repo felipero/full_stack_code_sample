@@ -1,0 +1,33 @@
+@import '_fonts.scss';
+@import '_variables.scss';
+
+body {
+  font-family: 'euclid-square', sans-serif;
+  font-weight: 300;
+  color: $body-color;
+  font-size: 16px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'euclid-square', sans-serif;
+  color: $secondary-color;
+  font-weight: 500;
+  letter-spacing: 1px;
+  font-size: 26px;
+}
+
+a {
+  color: $primary-color;
+  &:hover,
+  &:visited {
+    color: $secondary-color;
+  }
+}
+
+button {
+  background-color: $primary-color;
+  color: #fff;
+}
