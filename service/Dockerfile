@@ -24,4 +24,4 @@ RUN mix deps.get --only prod
 
 EXPOSE 4000
 
-CMD ["mix", "start.prod"]
+ENTRYPOINT ["./entrypoint.sh"]

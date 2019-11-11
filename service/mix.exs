@@ -8,7 +8,7 @@ defmodule ChattermillReviewService.Umbrella.MixProject do
       deps: deps(),
       aliases: aliases(),
       preferred_cli_env: [
-        "start.prod": :prod
+        "ecto.setup.prod": :prod
       ]
     ]
   end
@@ -33,11 +33,10 @@ defmodule ChattermillReviewService.Umbrella.MixProject do
 
   defp aliases do
     [
-      "start.prod": [
+      "ecto.setup.prod": [
         "ecto.create",
         "ecto.migrate",
-        "run apps/chattermill_review_service/priv/repo/seeds.exs",
-        "phx.server"
+        "run apps/chattermill_review_service/priv/repo/seeds.exs"
       ]
     ]
   end
