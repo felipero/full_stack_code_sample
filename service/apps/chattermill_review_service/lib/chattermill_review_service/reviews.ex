@@ -72,34 +72,32 @@ defmodule ChattermillReviewService.Reviews do
       [%{name: "Category 1", id: 452, sentiment: 0.00}]
 
   """
-  def average_sentiments_by_category() do
-    query =
+  def average_sentiments_by_category(id \\ nil) do
+    query_joins =
       from(s in ThemeSentiment,
         join: t in assoc(s, :theme),
-        join: c in assoc(t, :category),
+        join: c in assoc(t, :category)
+      )
+
+    query_with_conditions =
+      case id do
+        id when is_integer(id) ->
+          from([s, t, c] in query_joins,
+            where: c.id == ^id
+          )
+
+        _ ->
+          query_joins
+      end
+
+    query =
+      from([s, t, c] in query_with_conditions,
         group_by: [c.name, c.id],
         order_by: c.name,
         select: [c.name, c.id, avg(s.sentiment)]
       )
 
-    query
-    |> Repo.all()
-    |> Enum.map(fn entry ->
-      name = Enum.at(entry, 0)
-      id = Enum.at(entry, 1)
-
-      sentiment =
-        entry
-        |> Enum.at(2)
-        |> Decimal.round(2)
-        |> Decimal.to_float()
-
-      %{
-        name: name,
-        id: id,
-        sentiment: sentiment
-      }
-    end)
+    query |> list_all_averages
   end
 
   @doc """
@@ -111,15 +109,34 @@ defmodule ChattermillReviewService.Reviews do
       [%{name: "Theme 1", id: 6724, sentiment: 0.00}]
 
   """
-  def average_sentiments_by_theme() do
-    query =
+  def average_sentiments_by_theme(id \\ nil) do
+    query_joins =
       from(s in ThemeSentiment,
-        join: t in assoc(s, :theme),
+        join: t in assoc(s, :theme)
+      )
+
+    query_with_conditions =
+      case id do
+        id when is_integer(id) ->
+          from([s, t] in query_joins,
+            where: t.id == ^id
+          )
+
+        _ ->
+          query_joins
+      end
+
+    query =
+      from([s, t] in query_with_conditions,
         group_by: [t.name, t.id],
         order_by: t.name,
         select: [t.name, t.id, avg(s.sentiment)]
       )
 
+    query |> list_all_averages
+  end
+
+  defp list_all_averages(query) do
     query
     |> Repo.all()
     |> Enum.map(fn entry ->
