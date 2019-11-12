@@ -116,6 +116,30 @@ defmodule ChattermillReviewService.ReviewsTest do
                Reviews.average_sentiments_by_category(nil)
     end
 
+    test "average_sentiments_by_category/1 with review comment returns a list of category with the average sentiment" do
+      category_one = insert(:category, name: "Category 1")
+      category_two = insert(:category, name: "Category 2")
+      category_three = insert(:category, name: "Category 3")
+
+      theme_one = insert(:theme, name: "Theme 1", category: category_one)
+      theme_two = insert(:theme, name: "Theme 2", category: category_two)
+      theme_three = insert(:theme, name: "Theme 3", category: category_three)
+
+      review_one = insert(:review, comment: "you are all amazing people!")
+      review_two = insert(:review, comment: "people are ok!")
+
+      insert(:theme_sentiment, review: review_one, theme: theme_one, sentiment: 1)
+      insert(:theme_sentiment, review: review_one, theme: theme_two, sentiment: 0)
+      insert(:theme_sentiment, review: review_two, theme: theme_two, sentiment: -1)
+      insert(:theme_sentiment, theme: theme_two, sentiment: 1)
+      insert(:theme_sentiment, theme: theme_three, sentiment: 0)
+
+      assert [
+               %{name: "Category 1", id: category_one.id, sentiment: 1.00},
+               %{name: "Category 2", id: category_two.id, sentiment: -0.5}
+             ] == Reviews.average_sentiments_by_category("people!")
+    end
+
     test "average_sentiments_by_theme/0 returns a list of themes with the average sentiment" do
       category_one = insert(:category, name: "Category 1")
       category_two = insert(:category, name: "Category 2")
@@ -159,10 +183,7 @@ defmodule ChattermillReviewService.ReviewsTest do
       theme_one = insert(:theme, name: "Theme 1", category: category_one)
       theme_four = insert(:theme, id: 2134, name: "Theme 4", category: category_one)
 
-      # Category 1 sentiments
       insert(:theme_sentiment, theme: theme_one, sentiment: 1)
-
-      # Category two sentiment
       insert(:theme_sentiment, theme: theme_four, sentiment: 1)
 
       assert [
@@ -185,6 +206,22 @@ defmodule ChattermillReviewService.ReviewsTest do
       assert [
                %{name: "Theme 1", id: theme_one.id, sentiment: 1.00}
              ] == Reviews.average_sentiments_by_theme(nil)
+    end
+
+    test "average_sentiments_by_theme/1 with review comment returns a list of themes with the average sentiment" do
+      category_one = insert(:category, name: "Category 1")
+
+      theme_one = insert(:theme, name: "Theme 1", category: category_one)
+      theme_four = insert(:theme, id: 2134, name: "Theme 4", category: category_one)
+
+      review = insert(:review, comment: "my awesome review")
+
+      insert(:theme_sentiment, theme: theme_one, sentiment: 1)
+      insert(:theme_sentiment, theme: theme_four, review: review, sentiment: 1)
+
+      assert [
+               %{name: "Theme 4", id: theme_four.id, sentiment: 1.00}
+             ] == Reviews.average_sentiments_by_theme("awesome")
     end
   end
 end

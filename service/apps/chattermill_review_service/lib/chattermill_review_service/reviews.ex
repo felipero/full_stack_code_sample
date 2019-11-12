@@ -72,7 +72,7 @@ defmodule ChattermillReviewService.Reviews do
       [%{name: "Category 1", id: 452, sentiment: 0.00}]
 
   """
-  def average_sentiments_by_category(id \\ nil) do
+  def average_sentiments_by_category(filter \\ nil) do
     query_joins =
       from(s in ThemeSentiment,
         join: t in assoc(s, :theme),
@@ -80,10 +80,16 @@ defmodule ChattermillReviewService.Reviews do
       )
 
     query_with_conditions =
-      case id do
+      case filter do
         id when is_integer(id) ->
           from([s, t, c] in query_joins,
             where: c.id == ^id
+          )
+
+        phrase when is_binary(phrase) and phrase != "" ->
+          from([s, t] in query_joins,
+            join: r in assoc(s, :review),
+            where: fragment("plainto_tsquery(?) <@ plainto_tsquery(?)", ^phrase, r.comment)
           )
 
         _ ->
@@ -109,17 +115,23 @@ defmodule ChattermillReviewService.Reviews do
       [%{name: "Theme 1", id: 6724, sentiment: 0.00}]
 
   """
-  def average_sentiments_by_theme(id \\ nil) do
+  def average_sentiments_by_theme(filter \\ nil) do
     query_joins =
       from(s in ThemeSentiment,
         join: t in assoc(s, :theme)
       )
 
     query_with_conditions =
-      case id do
+      case filter do
         id when is_integer(id) ->
           from([s, t] in query_joins,
             where: t.id == ^id
+          )
+
+        phrase when is_binary(phrase) and phrase != "" ->
+          from([s, t] in query_joins,
+            join: r in assoc(s, :review),
+            where: fragment("plainto_tsquery(?) <@ plainto_tsquery(?)", ^phrase, r.comment)
           )
 
         _ ->
