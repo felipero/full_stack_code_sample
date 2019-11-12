@@ -1,5 +1,5 @@
 import React from 'react';
-import { get } from 'axios';
+import { create } from 'axios';
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act } from 'react-dom/test-utils';
 import CategoryApi from './CategoryApi';
@@ -13,7 +13,7 @@ function DummyChart({ dataset, categories, title }) {
   );
 }
 
-jest.mock('axios', () => ({ get: jest.fn() }));
+jest.mock('axios', () => ({ create: jest.fn() }));
 
 let container = null;
 
@@ -29,6 +29,8 @@ afterEach(() => {
 });
 
 it('renders data when api returns data', done => {
+  const getMock = jest.fn();
+  create.mockReturnValueOnce({ get: getMock });
   const promise = Promise.resolve({
     data: {
       averages: [
@@ -38,7 +40,7 @@ it('renders data when api returns data', done => {
     },
   });
 
-  get.mockReturnValueOnce(promise);
+  getMock.mockReturnValueOnce(promise);
 
   act(() => {
     render(
@@ -60,10 +62,12 @@ it('renders data when api returns data', done => {
 });
 
 it('renders nothing when api returns empty', done => {
+  const getMock = jest.fn();
+  create.mockReturnValueOnce({ get: getMock });
   const promise = Promise.resolve({
     data: { averages: [] },
   });
-  get.mockReturnValueOnce(promise);
+  getMock.mockReturnValueOnce(promise);
   act(() => {
     render(
       <CategoryApi>

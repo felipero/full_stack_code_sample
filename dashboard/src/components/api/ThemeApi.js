@@ -8,13 +8,14 @@ export default class ThemeApi extends React.Component {
       children: { render: renderChild },
     } = props;
 
+    this.axios = axios.create({ baseURL: process.env.REACT_APP_API_HOST });
     this.renderChild = renderChild;
     this.state = { data: null };
   }
 
   componentDidMount() {
-    axios
-      .get('http://127.0.0.1:4000/api/averages/themes')
+    this.axios
+      .get('/averages/themes')
       .then(resp => {
         if (resp && resp.data) {
           const averages = resp.data.averages || [];
