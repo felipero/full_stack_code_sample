@@ -1,15 +1,9 @@
 defmodule ChattermillReviewServiceWeb.ReviewController do
   use ChattermillReviewServiceWeb, :controller
 
-  alias ChattermillReviewService.Reviews
   alias ChattermillReviewService.ReviewAMQPWorker
 
   action_fallback(ChattermillReviewServiceWeb.FallbackController)
-
-  def index(conn, _params) do
-    reviews = Reviews.list_reviews()
-    render(conn, "index.json", reviews: reviews)
-  end
 
   def create(conn, %{"review" => review_params}) do
     case review_params do

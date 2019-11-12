@@ -2,63 +2,35 @@ defmodule ChattermillReviewServiceWeb.ReviewControllerTest do
   use ChattermillReviewServiceWeb.ConnCase, async: false
   import ChattermillReviewService.Factory
 
+  alias ChattermillReviewService.Repo
+  alias ChattermillReviewService.Reviews
+  alias ChattermillReviewService.Reviews.Review
+
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  describe "index" do
-    test "lists all reviews", %{conn: conn} do
-      review = insert(:review, id: 357, comment: "awesome", inserted_at: "2019-11-09T14:04:19")
-      insert(:theme_sentiment, review: review, sentiment: -1)
-      conn = get(conn, Routes.review_path(conn, :index))
-
-      assert %{
-               "data" => [
-                 %{
-                   "comment" => "awesome",
-                   "created_at" => "2019-11-09T14:04:19",
-                   "id" => 357,
-                   "theme_sentiments" => [
-                     %{
-                       "review_id" => 357,
-                       "sentiment" => -1,
-                       "theme_id" => _
-                     }
-                   ]
-                 }
-               ]
-             } = json_response(conn, 200)
-    end
-  end
-
   describe "create review" do
     @create_attrs %{
-      id: 54_321_729,
+      id: 54_321_720,
       comment: "not cool",
       created_at: "2019-07-18T23:28:36.000Z",
       themes: [
         %{
-          theme_id: 6427,
+          theme_id: 6423,
           sentiment: -1
         }
       ]
     }
     test "renders review when data is valid", %{conn: conn} do
-      insert(:theme, id: 6427)
+      insert(:theme, id: 6423)
       conn = post(conn, Routes.review_path(conn, :create), review: @create_attrs)
       assert "ok" = json_response(conn, 202)
 
       Process.sleep(10)
 
-      conn = get(conn, Routes.review_path(conn, :index))
-
-      assert [
-               %{
-                 "id" => id,
-                 "comment" => "not cool",
-                 "created_at" => "2019-07-18T23:28:36"
-               }
-             ] = json_response(conn, 200)["data"]
+      assert %Review{id: 54_321_720, comment: "not cool", inserted_at: ~N[2019-07-18 23:28:36]} =
+               Repo.get!(Review, 54_321_720)
     end
 
     @invalid_review_attrs %{

@@ -21,5 +21,6 @@ defmodule ChattermillReviewService.Reviews.Review do
     |> cast(attrs, [:id, :comment, :inserted_at])
     |> cast_assoc(:theme_sentiments)
     |> validate_required([:comment])
+    |> unique_constraint(:id)
   end
 end

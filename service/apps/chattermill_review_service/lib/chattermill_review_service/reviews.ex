@@ -9,21 +9,6 @@ defmodule ChattermillReviewService.Reviews do
   alias ChattermillReviewService.Reviews.Review
 
   @doc """
-  Returns the list of reviews.
-
-  ## Examples
-
-      iex> list_reviews()
-      [%Review{}, ...]
-
-  """
-  def list_reviews do
-    Review
-    |> Repo.all()
-    |> Repo.preload(:theme_sentiments)
-  end
-
-  @doc """
   Gets a single review.
 
   Raises `Ecto.NoResultsError` if the Review does not exist.
@@ -74,19 +59,6 @@ defmodule ChattermillReviewService.Reviews do
     %Review{}
     |> Review.changeset(attrs)
     |> Repo.insert()
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking review changes.
-
-  ## Examples
-
-      iex> change_review(review)
-      %Ecto.Changeset{source: %Review{}}
-
-  """
-  def change_review(%Review{} = review) do
-    Review.changeset(review, %{})
   end
 
   alias ChattermillReviewService.Reviews.ThemeSentiment

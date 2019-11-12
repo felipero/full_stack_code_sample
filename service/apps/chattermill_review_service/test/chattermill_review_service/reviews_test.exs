@@ -9,13 +9,6 @@ defmodule ChattermillReviewService.ReviewsTest do
     @update_attrs %{comment: "some updated comment"}
     @invalid_attrs %{comment: nil}
 
-    test "list_reviews/0 returns all reviews" do
-      review = insert(:review)
-      insert(:theme_sentiment, review: review)
-
-      assert Reviews.list_reviews() == [Repo.preload(review, :theme_sentiments)]
-    end
-
     test "get_review!/1 returns the review with given id" do
       review = insert(:review)
       assert Reviews.get_review!(review.id) == review
