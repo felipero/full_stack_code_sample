@@ -44,6 +44,24 @@ defmodule ChattermillReviewServiceWeb.AverageControllerTest do
                  %{"name" => "Category 2", "id" => category_two.id, "sentiment" => -0.25}
                ]
              } == json_response(conn, 200)
+
+      conn = get(conn, Routes.average_path(conn, :categories), id: nil)
+
+      assert %{
+               "averages" => [
+                 %{"name" => "Category 1", "id" => category_one.id, "sentiment" => 0.33},
+                 %{"name" => "Category 2", "id" => category_two.id, "sentiment" => -0.25}
+               ]
+             } == json_response(conn, 200)
+
+      conn = get(conn, Routes.average_path(conn, :categories), id: "")
+
+      assert %{
+               "averages" => [
+                 %{"name" => "Category 1", "id" => category_one.id, "sentiment" => 0.33},
+                 %{"name" => "Category 2", "id" => category_two.id, "sentiment" => -0.25}
+               ]
+             } == json_response(conn, 200)
     end
 
     test "lists all category averages with an specific id", %{conn: conn} do
@@ -66,7 +84,7 @@ defmodule ChattermillReviewServiceWeb.AverageControllerTest do
       # Category two sentiment
       insert(:theme_sentiment, theme: theme_three, sentiment: -1)
 
-      conn = get(conn, Routes.average_path(conn, :categories), id: 56_432)
+      conn = get(conn, Routes.average_path(conn, :categories), id: "56432")
 
       assert %{
                "averages" => [
@@ -107,6 +125,28 @@ defmodule ChattermillReviewServiceWeb.AverageControllerTest do
       insert(:theme_sentiment, theme: theme_four, sentiment: 0)
 
       conn = get(conn, Routes.average_path(conn, :themes))
+
+      assert %{
+               "averages" => [
+                 %{"name" => "Theme 1", "id" => theme_one.id, "sentiment" => 0.00},
+                 %{"name" => "Theme 2", "id" => theme_two.id, "sentiment" => 0.67},
+                 %{"name" => "Theme 3", "id" => theme_three.id, "sentiment" => -0.67},
+                 %{"name" => "Theme 4", "id" => theme_four.id, "sentiment" => 0.00}
+               ]
+             } == json_response(conn, 200)
+
+      conn = get(conn, Routes.average_path(conn, :themes), id: nil)
+
+      assert %{
+               "averages" => [
+                 %{"name" => "Theme 1", "id" => theme_one.id, "sentiment" => 0.00},
+                 %{"name" => "Theme 2", "id" => theme_two.id, "sentiment" => 0.67},
+                 %{"name" => "Theme 3", "id" => theme_three.id, "sentiment" => -0.67},
+                 %{"name" => "Theme 4", "id" => theme_four.id, "sentiment" => 0.00}
+               ]
+             } == json_response(conn, 200)
+
+      conn = get(conn, Routes.average_path(conn, :themes), id: "")
 
       assert %{
                "averages" => [

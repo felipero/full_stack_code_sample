@@ -8,6 +8,15 @@ defmodule ChattermillReviewServiceWeb.AverageController do
   def categories(conn, params) when params == %{}, do: categories(conn, %{"id" => nil})
 
   def categories(conn, %{"id" => id}) do
+    id =
+      case id do
+        id when is_binary(id) and id != "" ->
+          String.to_integer(id)
+
+        id ->
+          id
+      end
+
     averages = Reviews.average_sentiments_by_category(id)
     render(conn, "averages.json", averages: averages)
   end
