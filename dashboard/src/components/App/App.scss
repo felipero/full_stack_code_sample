@@ -4,6 +4,15 @@
 .App {
   text-align: center;
 
+  .Filters {
+    display: flex;
+    justify-content: center;
+    select {
+      width: 220px;
+      margin: 0 10px;
+    }
+  }
+
   .Charts {
     display: flex;
     align-items: flex-start;
