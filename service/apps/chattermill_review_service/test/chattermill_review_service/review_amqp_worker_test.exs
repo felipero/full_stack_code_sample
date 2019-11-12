@@ -4,12 +4,6 @@ defmodule ChattermillReviewService.ReviewAMQPWorkerTest do
 
   alias ChattermillReviewService.{ReviewAMQPWorker, Reviews}
 
-  setup_all do
-    System.put_env("AMQP_QUEUE", "chattermill_review_test")
-
-    on_exit(fn -> System.delete_env("AMQP_QUEUE") end)
-  end
-
   describe "publish_review/1" do
     test "returns the encoded message when valid data" do
       {:noreply, channel} = ReviewAMQPWorker.handle_continue(:connect, nil)

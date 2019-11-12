@@ -16,7 +16,7 @@ ENV SECRET_KEY_BASE LCCZm2SCbZDYoIRIecOApmNAmdITmk9U0qrCAUMu46/KaFsW1KWCKU0b3c6k
 
 ENV AMQP_HOST chattermill-rabbitmq-service.default 
 ENV AMQP_PORT 5672
-ENV AMQP_QUEUE chattermill_review
+ENV AMQP_QUEUE chattermill_review_prod
 
 ENV DATABASE_URL ecto://postgres:postgres@chattermill-postgres-service.default:5432/chattermill_review_service_prod 
 

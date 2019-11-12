@@ -107,7 +107,8 @@ defmodule ChattermillReviewService.ReviewAMQPWorker do
     {
       System.get_env("AMQP_HOST", "localhost"),
       String.to_integer(System.get_env("AMQP_PORT", "30003")),
-      System.get_env("AMQP_QUEUE", "chattermill_review"),
+      Application.get_env(:chattermill_review_service, ReviewAMQPWorker)[:queue] ||
+        System.get_env("AMQP_QUEUE", "chattermill_review_dev"),
       10_000
     }
   end
