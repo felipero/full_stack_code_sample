@@ -3,24 +3,6 @@ import { render, unmountComponentAtNode } from 'react-dom';
 import { act } from 'react-dom/test-utils';
 import App from './App';
 
-jest.mock('../Header', () => {
-  return function DummyHeader() {
-    return <div className="Header">chattermill mocked header</div>;
-  };
-});
-
-jest.mock('../api/CategoryApi', () => {
-  return function MockApi(_) {
-    return <div className="CategoryChart">chart</div>;
-  };
-});
-
-jest.mock('../api/ThemeApi', () => {
-  return function MockApi(_) {
-    return <div className="ThemeChart">chart</div>;
-  };
-});
-
 let container = null;
 
 beforeEach(() => {
@@ -34,11 +16,23 @@ afterEach(() => {
   container = null;
 });
 
+jest.mock('../Header', () => {
+  return function DummyHeader() {
+    return <div className="Header">chattermill mocked header</div>;
+  };
+});
+
+jest.mock('../api/AverageApi', () => {
+  return function MockApi({ type: type }) {
+    return <div className={'Chart-' + type}>chart {type}</div>;
+  };
+});
+
 it('renders without crashing', () => {
   act(() => {
     render(<App />, container);
   });
   expect(container.querySelector('.App .Header').textContent).toBe('chattermill mocked header');
-  expect(container.querySelector('.App .CategoryChart').textContent).toBe('chart');
-  expect(container.querySelector('.App .ThemeChart').textContent).toBe('chart');
+  expect(container.querySelector('.App .Chart-categories').textContent).toBe('chart categories');
+  expect(container.querySelector('.App .Chart-themes').textContent).toBe('chart themes');
 });

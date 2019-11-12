@@ -2,7 +2,7 @@ import React from 'react';
 import { create } from 'axios';
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act } from 'react-dom/test-utils';
-import CategoryApi from './CategoryApi';
+import CategoryApi from './AverageApi';
 
 function DummyChart({ dataset, categories, title }) {
   return (
@@ -42,9 +42,11 @@ it('renders data when api returns data', done => {
 
   getMock.mockReturnValueOnce(promise);
 
+  const mockCallback = jest.fn();
+
   act(() => {
     render(
-      <CategoryApi>
+      <CategoryApi key={123} selectedId={123} callback={mockCallback}>
         {{
           render: function render(data) {
             return <DummyChart dataset={data.dataset} categories={data.categories} title="Average sentiment by categories" />;
@@ -56,6 +58,8 @@ it('renders data when api returns data', done => {
   });
 
   promise.then(_data => {
+    expect(mockCallback.mock.calls.length).toBe(1);
+
     expect(container.querySelector('.Chart').textContent).toBe('Average sentiment by categories : 0.67-0.25 : BarBaz');
     done();
   });
@@ -68,9 +72,12 @@ it('renders nothing when api returns empty', done => {
     data: { averages: [] },
   });
   getMock.mockReturnValueOnce(promise);
+
+  const mockCallback = jest.fn();
+
   act(() => {
     render(
-      <CategoryApi>
+      <CategoryApi key={123} selectedId={123} callback={mockCallback}>
         {{
           render: function render(_) {
             return 'fail!';
@@ -81,6 +88,7 @@ it('renders nothing when api returns empty', done => {
     );
   });
   promise.then(_ => {
+    expect(mockCallback.mock.calls.length).toBe(1);
     expect(container.textContent).toBe('');
     done();
   });
