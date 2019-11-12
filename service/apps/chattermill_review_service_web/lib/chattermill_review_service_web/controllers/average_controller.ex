@@ -8,23 +8,17 @@ defmodule ChattermillReviewServiceWeb.AverageController do
   def categories(conn, params) when params == %{}, do: categories(conn, %{"id" => nil})
 
   def categories(conn, %{"id" => id}) do
-    id =
-      case id do
-        id when is_binary(id) and id != "" ->
-          String.to_integer(id)
-
-        id ->
-          id
-      end
-
-    averages = Reviews.average_sentiments_by_category(id)
+    averages = Reviews.average_sentiments_by_category(cast_id(id))
     render(conn, "averages.json", averages: averages)
   end
 
   def themes(conn, params) when params == %{}, do: themes(conn, %{"id" => nil})
 
   def themes(conn, %{"id" => id}) do
-    averages = Reviews.average_sentiments_by_theme(id)
+    averages = Reviews.average_sentiments_by_theme(cast_id(id))
     render(conn, "averages.json", averages: averages)
   end
+
+  defp cast_id(id) when is_binary(id) and id != "", do: String.to_integer(id)
+  defp cast_id(id), do: id
 end

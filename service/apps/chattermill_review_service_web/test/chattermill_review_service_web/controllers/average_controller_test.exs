@@ -172,7 +172,7 @@ defmodule ChattermillReviewServiceWeb.AverageControllerTest do
       insert(:theme_sentiment, theme: theme_two, sentiment: 1)
       insert(:theme_sentiment, theme: theme_two, sentiment: 0)
 
-      conn = get(conn, Routes.average_path(conn, :themes), id: 34_543)
+      conn = get(conn, Routes.average_path(conn, :themes), id: "34543")
 
       assert %{
                "averages" => [
