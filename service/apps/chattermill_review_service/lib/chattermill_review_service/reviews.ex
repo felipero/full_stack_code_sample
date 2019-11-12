@@ -77,40 +77,6 @@ defmodule ChattermillReviewService.Reviews do
   end
 
   @doc """
-  Updates a review.
-
-  ## Examples
-
-      iex> update_review(review, %{field: new_value})
-      {:ok, %Review{}}
-
-      iex> update_review(review, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_review(%Review{} = review, attrs) do
-    review
-    |> Review.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a Review.
-
-  ## Examples
-
-      iex> delete_review(review)
-      {:ok, %Review{}}
-
-      iex> delete_review(review)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_review(%Review{} = review) do
-    Repo.delete(review)
-  end
-
-  @doc """
   Returns an `%Ecto.Changeset{}` for tracking review changes.
 
   ## Examples
@@ -126,96 +92,79 @@ defmodule ChattermillReviewService.Reviews do
   alias ChattermillReviewService.Reviews.ThemeSentiment
 
   @doc """
-  Returns the list of theme_sentiments.
+  Returns the list of categories with its sentiment average.
 
   ## Examples
 
-      iex> list_theme_sentiments()
-      [%ThemeSentiment{}, ...]
+      iex> average_sentiments_by_category()
+      [%{name: "Category 1", id: 452, sentiment: 0.00}]
 
   """
-  def list_theme_sentiments do
-    Repo.all(ThemeSentiment)
+  def average_sentiments_by_category() do
+    query =
+      from(s in ThemeSentiment,
+        join: t in assoc(s, :theme),
+        join: c in assoc(t, :category),
+        group_by: [c.name, c.id],
+        order_by: c.name,
+        select: [c.name, c.id, avg(s.sentiment)]
+      )
+
+    query
+    |> Repo.all()
+    |> Enum.map(fn entry ->
+      name = Enum.at(entry, 0)
+      id = Enum.at(entry, 1)
+
+      sentiment =
+        entry
+        |> Enum.at(2)
+        |> Decimal.round(2)
+        |> Decimal.to_float()
+
+      %{
+        name: name,
+        id: id,
+        sentiment: sentiment
+      }
+    end)
   end
 
   @doc """
-  Gets a single theme_sentiment.
-
-  Raises `Ecto.NoResultsError` if the Theme sentiment does not exist.
+  Returns the list of themes with its sentiment average.
 
   ## Examples
 
-      iex> get_theme_sentiment!(123)
-      %ThemeSentiment{}
-
-      iex> get_theme_sentiment!(456)
-      ** (Ecto.NoResultsError)
+      iex> average_sentiments_by_theme()
+      [%{name: "Theme 1", id: 6724, sentiment: 0.00}]
 
   """
-  def get_theme_sentiment!(id), do: Repo.get!(ThemeSentiment, id)
+  def average_sentiments_by_theme() do
+    query =
+      from(s in ThemeSentiment,
+        join: t in assoc(s, :theme),
+        group_by: [t.name, t.id],
+        order_by: t.name,
+        select: [t.name, t.id, avg(s.sentiment)]
+      )
 
-  @doc """
-  Creates a theme_sentiment.
+    query
+    |> Repo.all()
+    |> Enum.map(fn entry ->
+      name = Enum.at(entry, 0)
+      id = Enum.at(entry, 1)
 
-  ## Examples
+      sentiment =
+        entry
+        |> Enum.at(2)
+        |> Decimal.round(2)
+        |> Decimal.to_float()
 
-      iex> create_theme_sentiment(%{field: value})
-      {:ok, %ThemeSentiment{}}
-
-      iex> create_theme_sentiment(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_theme_sentiment(attrs \\ %{}) do
-    %ThemeSentiment{}
-    |> ThemeSentiment.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a theme_sentiment.
-
-  ## Examples
-
-      iex> update_theme_sentiment(theme_sentiment, %{field: new_value})
-      {:ok, %ThemeSentiment{}}
-
-      iex> update_theme_sentiment(theme_sentiment, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_theme_sentiment(%ThemeSentiment{} = theme_sentiment, attrs) do
-    theme_sentiment
-    |> ThemeSentiment.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a ThemeSentiment.
-
-  ## Examples
-
-      iex> delete_theme_sentiment(theme_sentiment)
-      {:ok, %ThemeSentiment{}}
-
-      iex> delete_theme_sentiment(theme_sentiment)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_theme_sentiment(%ThemeSentiment{} = theme_sentiment) do
-    Repo.delete(theme_sentiment)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking theme_sentiment changes.
-
-  ## Examples
-
-      iex> change_theme_sentiment(theme_sentiment)
-      %Ecto.Changeset{source: %ThemeSentiment{}}
-
-  """
-  def change_theme_sentiment(%ThemeSentiment{} = theme_sentiment) do
-    ThemeSentiment.changeset(theme_sentiment, %{})
+      %{
+        name: name,
+        id: id,
+        sentiment: sentiment
+      }
+    end)
   end
 end

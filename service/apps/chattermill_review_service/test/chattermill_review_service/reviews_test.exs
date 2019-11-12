@@ -49,109 +49,79 @@ defmodule ChattermillReviewService.ReviewsTest do
     test "create_review/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Reviews.create_review(@invalid_attrs)
     end
-
-    test "update_review/2 with valid data updates the review" do
-      review = insert(:review)
-      assert {:ok, %Review{} = review} = Reviews.update_review(review, @update_attrs)
-      assert review.comment == "some updated comment"
-    end
-
-    test "update_review/2 with invalid data returns error changeset" do
-      review = insert(:review)
-      assert {:error, %Ecto.Changeset{}} = Reviews.update_review(review, @invalid_attrs)
-      assert review == Reviews.get_review!(review.id)
-    end
-
-    test "delete_review/1 deletes the review" do
-      review = insert(:review)
-      assert {:ok, %Review{}} = Reviews.delete_review(review)
-      assert_raise Ecto.NoResultsError, fn -> Reviews.get_review!(review.id) end
-    end
-
-    test "change_review/1 returns a review changeset" do
-      review = insert(:review)
-      assert %Ecto.Changeset{} = Reviews.change_review(review)
-    end
   end
 
   describe "theme_sentiments" do
-    @update_attrs params_for(:theme_sentiment, %{sentiment: 0})
-    @invalid_attrs %{review_id: nil, theme_id: nil, sentiment: nil}
+    test "average_sentiments_by_category/0 returns a list of categories with the average sentiment" do
+      category_one = insert(:category, name: "Category 1")
+      category_two = insert(:category, name: "Category 2")
 
-    test "list_theme_sentiments/0 returns all theme_sentiments" do
-      theme_sentiment = insert(:theme_sentiment)
+      theme_one = insert(:theme, name: "Theme one", category: category_one)
+      theme_two = insert(:theme, name: "Theme two", category: category_one)
+      theme_three = insert(:theme, name: "Theme three", category: category_two)
+      theme_four = insert(:theme, name: "Theme four", category: category_two)
+
+      # Category 1 sentiments
+      insert(:theme_sentiment, theme: theme_one, sentiment: 1)
+      insert(:theme_sentiment, theme: theme_one, sentiment: 0)
+      insert(:theme_sentiment, theme: theme_one, sentiment: -1)
+
+      insert(:theme_sentiment, theme: theme_two, sentiment: 1)
+      insert(:theme_sentiment, theme: theme_two, sentiment: 1)
+      insert(:theme_sentiment, theme: theme_two, sentiment: 0)
+
+      # Category two sentiment
+      insert(:theme_sentiment, theme: theme_three, sentiment: -1)
+      insert(:theme_sentiment, theme: theme_three, sentiment: -1)
+      insert(:theme_sentiment, theme: theme_three, sentiment: 0)
+
+      insert(:theme_sentiment, theme: theme_four, sentiment: 0)
+      insert(:theme_sentiment, theme: theme_four, sentiment: -1)
+      insert(:theme_sentiment, theme: theme_four, sentiment: 0)
+      insert(:theme_sentiment, theme: theme_four, sentiment: 1)
+      insert(:theme_sentiment, theme: theme_four, sentiment: 0)
 
       assert [
-               %ThemeSentiment{
-                 id: id,
-                 sentiment: sentiment,
-                 review_id: review_id,
-                 theme_id: theme_id
-               }
-             ] = Reviews.list_theme_sentiments()
-
-      assert id == theme_sentiment.id
-      assert review_id == theme_sentiment.review_id
-      assert theme_id == theme_sentiment.theme_id
-      assert sentiment == theme_sentiment.sentiment
+               %{name: "Category 1", id: category_one.id, sentiment: 0.33},
+               %{name: "Category 2", id: category_two.id, sentiment: -0.25}
+             ] == Reviews.average_sentiments_by_category()
     end
 
-    test "get_theme_sentiment!/1 returns the theme_sentiment with given id" do
-      theme_sentiment = insert(:theme_sentiment)
+    test "average_sentiments_by_theme/0 returns a list of themes with the average sentiment" do
+      category_one = insert(:category, name: "Category 1")
+      category_two = insert(:category, name: "Category 2")
 
-      assert %ThemeSentiment{} =
-               returned_theme_sentiment = Reviews.get_theme_sentiment!(theme_sentiment.id)
+      theme_one = insert(:theme, name: "Theme 1", category: category_one)
+      theme_two = insert(:theme, name: "Theme 2", category: category_one)
+      theme_three = insert(:theme, name: "Theme 3", category: category_two)
+      theme_four = insert(:theme, name: "Theme 4", category: category_two)
 
-      assert returned_theme_sentiment.sentiment == theme_sentiment.sentiment
-    end
+      # Category 1 sentiments
+      insert(:theme_sentiment, theme: theme_one, sentiment: 1)
+      insert(:theme_sentiment, theme: theme_one, sentiment: 0)
+      insert(:theme_sentiment, theme: theme_one, sentiment: -1)
 
-    test "create_theme_sentiment/1 with valid data creates a theme_sentiment" do
-      assert {:ok, %ThemeSentiment{} = theme_sentiment} =
-               Reviews.create_theme_sentiment(
-                 params_with_assocs(:theme_sentiment, %{sentiment: -1})
-               )
+      insert(:theme_sentiment, theme: theme_two, sentiment: 1)
+      insert(:theme_sentiment, theme: theme_two, sentiment: 1)
+      insert(:theme_sentiment, theme: theme_two, sentiment: 0)
 
-      assert theme_sentiment.sentiment == -1
-    end
+      # Category two sentiment
+      insert(:theme_sentiment, theme: theme_three, sentiment: -1)
+      insert(:theme_sentiment, theme: theme_three, sentiment: -1)
+      insert(:theme_sentiment, theme: theme_three, sentiment: 0)
 
-    test "create_theme_sentiment/1 with invalid data returns error changeset" do
-      assert {:error,
-              %Ecto.Changeset{
-                errors: [
-                  sentiment: {"can't be blank", [validation: :required]},
-                  theme_id: {"can't be blank", [validation: :required]}
-                ]
-              }} = Reviews.create_theme_sentiment(@invalid_attrs)
-    end
+      insert(:theme_sentiment, theme: theme_four, sentiment: 0)
+      insert(:theme_sentiment, theme: theme_four, sentiment: -1)
+      insert(:theme_sentiment, theme: theme_four, sentiment: 0)
+      insert(:theme_sentiment, theme: theme_four, sentiment: 1)
+      insert(:theme_sentiment, theme: theme_four, sentiment: 0)
 
-    test "update_theme_sentiment/2 with valid data updates the theme_sentiment" do
-      theme_sentiment = insert(:theme_sentiment)
-
-      assert {:ok, %ThemeSentiment{} = theme_sentiment} =
-               Reviews.update_theme_sentiment(theme_sentiment, @update_attrs)
-
-      assert theme_sentiment.sentiment == 0
-    end
-
-    test "update_theme_sentiment/2 with invalid data returns error changeset" do
-      theme_sentiment = insert(:theme_sentiment)
-
-      assert {:error, %Ecto.Changeset{}} =
-               Reviews.update_theme_sentiment(theme_sentiment, @invalid_attrs)
-
-      assert theme_sentiment.sentiment ==
-               Reviews.get_theme_sentiment!(theme_sentiment.id).sentiment
-    end
-
-    test "delete_theme_sentiment/1 deletes the theme_sentiment" do
-      theme_sentiment = insert(:theme_sentiment)
-      assert {:ok, %ThemeSentiment{}} = Reviews.delete_theme_sentiment(theme_sentiment)
-      assert_raise Ecto.NoResultsError, fn -> Reviews.get_theme_sentiment!(theme_sentiment.id) end
-    end
-
-    test "change_theme_sentiment/1 returns a theme_sentiment changeset" do
-      theme_sentiment = insert(:theme_sentiment)
-      assert %Ecto.Changeset{} = Reviews.change_theme_sentiment(theme_sentiment)
+      assert [
+               %{name: "Theme 1", id: theme_one.id, sentiment: 0.00},
+               %{name: "Theme 2", id: theme_two.id, sentiment: 0.67},
+               %{name: "Theme 3", id: theme_three.id, sentiment: -0.67},
+               %{name: "Theme 4", id: theme_four.id, sentiment: 0.00}
+             ] == Reviews.average_sentiments_by_theme()
     end
   end
 end
