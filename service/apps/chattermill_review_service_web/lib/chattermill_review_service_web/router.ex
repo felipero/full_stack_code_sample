@@ -9,5 +9,8 @@ defmodule ChattermillReviewServiceWeb.Router do
     pipe_through(:api)
 
     resources("/reviews", ReviewController, only: [:index, :create])
+
+    get("/averages/categories", AverageController, :categories)
+    get("/averages/themes", AverageController, :themes)
   end
 end
