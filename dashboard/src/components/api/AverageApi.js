@@ -24,7 +24,6 @@ export default class AverageApi extends React.Component {
   componentDidMount() {
     const path = '/averages/' + this.type;
     const query = this.searchTerm ? '?term=' + this.searchTerm : this.selectedId ? '/' + this.selectedId : '';
-    console.log('FUUU DID MOUNT: ', query);
     this.axios
       .get(path + query)
       .then(resp => {
