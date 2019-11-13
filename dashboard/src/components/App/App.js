@@ -3,48 +3,41 @@ import './App.scss';
 import Header from '../Header';
 import Chart from '../Chart';
 import AverageApi from '../api/AverageApi';
+import Filters from '../Filters';
 
 function App() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [themes, setThemes] = useState([]);
   const [selectedTheme, setSelectedTheme] = useState(null);
+  const [term, setTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleCategoryChange = e => {
-    const value = e.target.options[e.target.selectedIndex].value;
-    setSelectedCategory(value);
-  };
-
-  const handleThemeChange = e => {
-    const value = e.target.options[e.target.selectedIndex].value;
-    setSelectedTheme(value);
+  const handleSearch = () => {
+    setSearchTerm(term);
   };
 
   return (
     <section className="App">
       <Header />
-      <div className="Filters">
-        <select onChange={handleCategoryChange}>
-          <option value="">All categories</option>
-          {categories.map(category => (
-            <option key={category.name + category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+      <Filters
+        categories={categories}
+        categoryCallback={setSelectedCategory}
+        themes={themes}
+        themeCallback={setSelectedTheme}
+        term={term}
+        termCallback={setTerm}
+        searchCallback={handleSearch}
+      />
 
-        <select onChange={handleThemeChange}>
-          <option value="">All themes</option>
-          {themes.map(theme => (
-            <option key={theme.name + theme.id} value={theme.id}>
-              {theme.name}
-            </option>
-          ))}
-        </select>
-      </div>
       <div className="Charts">
         <div className="Chart">
-          <AverageApi key={selectedCategory} type={'categories'} selectedId={selectedCategory} callback={setCategories}>
+          <AverageApi
+            key={selectedCategory + searchTerm}
+            searchTerm={searchTerm}
+            type={'categories'}
+            selectedId={selectedCategory}
+            callback={setCategories}>
             {{
               render: function render(data) {
                 return <Chart dataset={data.dataset} categories={data.categories} title="Average sentiment by categories" />;
@@ -54,7 +47,7 @@ function App() {
         </div>
 
         <div className="Chart">
-          <AverageApi key={selectedTheme} type={'themes'} selectedId={selectedTheme} callback={setThemes}>
+          <AverageApi key={selectedTheme + searchTerm} searchTerm={searchTerm} type={'themes'} selectedId={selectedTheme} callback={setThemes}>
             {{
               render: function render(data) {
                 return <Chart dataset={data.dataset} categories={data.categories} title="Average sentiment by themes" />;

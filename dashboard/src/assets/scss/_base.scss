@@ -1,6 +1,6 @@
 @import '_fonts.scss';
 @import '_variables.scss';
-@import '_select.scss';
+@import '_form.scss';
 
 body {
   font-family: 'euclid-square', sans-serif;
@@ -26,9 +26,4 @@ a {
   &:visited {
     color: $secondary-color;
   }
-}
-
-button {
-  background-color: $primary-color;
-  color: #fff;
 }

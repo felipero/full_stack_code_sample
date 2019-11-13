@@ -1,16 +1,35 @@
-select {
+select,
+button,
+input[type='text'] {
   display: block;
   font-size: 14px;
-  font-family: sans-serif;
+  font-family: 'euclid-square', sans-serif;
   color: #444;
   line-height: 1.3;
-  padding: 0.6em 1.4em 0.5em 0.8em;
+  padding: 0.5em;
   max-width: 100%;
   box-sizing: border-box;
   margin: 0;
   border: 1px solid #aaa;
   box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
   border-radius: 0.5em;
+  font-weight: 300;
+  outline: none;
+}
+
+button {
+  background-color: $primary-color;
+  border-color: $primary-color;
+  padding: 0.6em 0.8em;
+  color: #fff;
+  cursor: pointer;
+  &:active {
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  }
+}
+
+select {
+  padding: 0.6em 1.4em 0.5em 0.8em;
   -moz-appearance: none;
   -webkit-appearance: none;
   appearance: none;

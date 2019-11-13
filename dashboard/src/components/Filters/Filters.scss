@@ -1,0 +1,30 @@
+.Filters {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  > div {
+    margin: 15px 0;
+    select,
+    input[type='text'] {
+      width: 220px;
+      margin: 0 20px;
+    }
+
+    .Search {
+      display: flex;
+      input[type='text'] {
+        margin-right: 0;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-right-color: transparent;
+      }
+
+      button {
+        margin-left: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+  }
+}
