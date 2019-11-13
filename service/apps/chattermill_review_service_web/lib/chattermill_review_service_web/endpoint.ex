@@ -46,7 +46,7 @@ defmodule ChattermillReviewServiceWeb.Endpoint do
 
   plug(
     CORSPlug,
-    origin: ~r/http:\/\/((localhost|0.0.0.0|127.0.0.1'):\d{4})|localdev/
+    origin: ~r/.*/
   )
 
   plug(ChattermillReviewServiceWeb.Router)
