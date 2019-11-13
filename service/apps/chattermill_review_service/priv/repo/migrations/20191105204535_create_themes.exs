@@ -4,7 +4,7 @@ defmodule ChattermillReviewService.Repo.Migrations.CreateThemes do
   def change do
     create table(:themes) do
       add(:name, :string, null: false)
-      add(:category_id, references(:categories, on_delete: :restrict, null: false))
+      add(:category_id, references(:categories, on_delete: :restrict), null: false)
 
       timestamps()
     end

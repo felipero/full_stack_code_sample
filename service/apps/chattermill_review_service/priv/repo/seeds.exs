@@ -23,7 +23,7 @@ defmodule ChattermillReviewService.Seed do
 
   def create_review(
         %{
-          "id" => _id,
+          "id" => id,
           "comment" => _comment,
           "themes" => theme_sentiments_attrs,
           "created_at" => inserted_at
@@ -39,6 +39,7 @@ defmodule ChattermillReviewService.Seed do
     |> Repo.insert!(on_conflict: :nothing)
 
     theme_sentiments_attrs
+    |> Enum.map(fn ts -> Map.merge(ts, %{"review_id" => id}) end)
     |> Enum.each(&ChattermillReviewService.Seed.create_theme_sentiment/1)
   end
 

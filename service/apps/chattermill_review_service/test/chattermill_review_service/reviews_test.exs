@@ -31,7 +31,7 @@ defmodule ChattermillReviewService.ReviewsTest do
 
       assert {:ok, %Review{} = review} = Reviews.create_review(attrs)
       assert review.comment == "excellent"
-      assert [%ThemeSentiment{theme_id: 6373}] = review.theme_sentiments
+      assert [%ThemeSentiment{theme_id: 6373, review_id: 59_458_292}] = review.theme_sentiments
     end
 
     test "create_review/1 with valid data creates a review" do
@@ -221,7 +221,7 @@ defmodule ChattermillReviewService.ReviewsTest do
 
       assert [
                %{name: "Theme 4", id: theme_four.id, sentiment: 1.00}
-             ] == Reviews.average_sentiments_by_theme("awesome")
+             ] == Reviews.average_sentiments_by_theme("awesome review")
     end
   end
 end
