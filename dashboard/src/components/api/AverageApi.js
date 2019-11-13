@@ -9,19 +9,22 @@ export default class AverageApi extends React.Component {
       callback: setData,
       selectedId: selectedId,
       type: type,
+      searchTerm: searchTerm,
     } = props;
 
     this.axios = axios.create({ baseURL: process.env.REACT_APP_API_HOST });
     this.setData = setData;
     this.renderChild = renderChild;
     this.selectedId = selectedId;
+    this.searchTerm = searchTerm;
     this.type = type;
     this.state = { data: null };
   }
 
   componentDidMount() {
     const path = '/averages/' + this.type;
-    const query = this.selectedId ? '/' + this.selectedId : '';
+    const query = this.searchTerm ? '?term=' + this.searchTerm : this.selectedId ? '/' + this.selectedId : '';
+    console.log('FUUU DID MOUNT: ', query);
     this.axios
       .get(path + query)
       .then(resp => {

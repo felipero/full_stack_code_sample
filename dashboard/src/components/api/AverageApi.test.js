@@ -2,7 +2,7 @@ import React from 'react';
 import { create } from 'axios';
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act } from 'react-dom/test-utils';
-import CategoryApi from './AverageApi';
+import AverageApi from './AverageApi';
 
 function DummyChart({ dataset, categories, title }) {
   return (
@@ -46,13 +46,13 @@ it('renders data when api returns data', done => {
 
   act(() => {
     render(
-      <CategoryApi key={123} selectedId={123} callback={mockCallback}>
+      <AverageApi key={123} selectedId={123} callback={mockCallback}>
         {{
           render: function render(data) {
             return <DummyChart dataset={data.dataset} categories={data.categories} title="Average sentiment by categories" />;
           },
         }}
-      </CategoryApi>,
+      </AverageApi>,
       container,
     );
   });
@@ -77,13 +77,13 @@ it('renders nothing when api returns empty', done => {
 
   act(() => {
     render(
-      <CategoryApi key={123} selectedId={123} callback={mockCallback}>
+      <AverageApi key={123} selectedId={123} callback={mockCallback}>
         {{
           render: function render(_) {
             return 'fail!';
           },
         }}
-      </CategoryApi>,
+      </AverageApi>,
       container,
     );
   });
