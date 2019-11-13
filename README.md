@@ -24,7 +24,7 @@ The dashboard app is a simple react app. The api requests it makes will point to
 
 You can start the app with the following commands:
 
-```
+```shell
 yarn install
 
 yarn start
@@ -38,7 +38,7 @@ You will need a RabbitMQ and a Postgres services running to run the applications
 
 The default configuration expects a postgres on `localhost:5432` and a RabbitMQ on `localhost:30003`. You can override that with env vars, as follow:
 
-```
+```shell
 AMQP_HOST=localhost
 AMQP_PORT=30003
 AMQP_QUEUE=chattermill_review_dev
@@ -50,7 +50,7 @@ The `AMQP_PORT` points to 30003 because I'm running rabbit from a kubernetes clu
 
 To run the tests you have to setup the database like this:
 
-```
+```shell
 cd service
 
 mix ecto.create
@@ -62,7 +62,7 @@ mix test
 
 To start the application, you can load the seed data and start the phoenix server like that:
 
-```
+```shell
 cd service # assuming you're not there already
 
 mix run apps/chattermill_review_service/priv/repo/seeds.exs
@@ -80,7 +80,7 @@ I configured a kubernetes cluster for this application. It is not optimised for 
 
 To build the local docker images for the dashboard run the following commands:
 
-```
+```shell
 cd dashboard
 
 docker image build -t chattermill-dashboard:0.1 .
@@ -88,7 +88,7 @@ docker image build -t chattermill-dashboard:0.1 .
 
 To build the local docker image for the api service run:
 
-```
+```shell
 cd service
 
 docker image build -t chattermill-api:0.1 .
@@ -96,7 +96,7 @@ docker image build -t chattermill-api:0.1 .
 
 After that you can start the pods and services in the kubernetes with the following command:
 
-```
+```shell
 kubectl apply -k .
 ```
 
@@ -104,7 +104,7 @@ kubectl apply -k .
 
 Kubernetes is configuration starts with the `kustomization.yml` file. It just loads the yaml files for our 4 services.
 
-```
+```yaml
 resources:
   - dashboard/dashboard.yml
   - service/api.yml
@@ -128,7 +128,7 @@ To view the charts you just have to navigate to the dashboard and use the filter
 
 I created an endpoint to receive new reviews at `POST api/reviews`, which should receive a body json data like so:
 
-```
+```json
 {
     "review": {
         "comment": "Felipero is excellent keep it up",
