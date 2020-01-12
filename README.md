@@ -1,5 +1,35 @@
 # Chattermill Code Challenge by Felipe Rodrigues
 
+## Requirements
+
+Recently we conducted several customer development interviews asking our potential clients how they analyze their customer feedback (let’s say their product reviews) and what kind of tool could be helpful for this. We realized that we need to build a very simple product that would allow them to track experience of their customers by giving them a dashboard that displays metrics based on their customer feedback.
+
+To build an MVP we gathered a dataset based on public data which represents Google Play and Apple App Store reviews for various mobile apps popular in the UK. We applied our machine learning algorithms to this data to extract themes (which are various aspects of our client’s business like payments, delivery, product quality etc.) of each review and sentiments of those themes.
+
+For our MVP we need to build a frontend with a single screen that would display couple charts and a backend that would serve API for our frontend.
+
+You received `dataset.zip` which contains JSON representation of our dataset. Please use these files to populate data storage of your choice.
+
+### Dashboard screen
+
+Dashboard screen is the only screen of our frontend and it contains filters and charts. Here are the filters we need to implement:
+● Filter by theme
+● Filter by category
+● Filter by phrase in a product review
+
+In theme and category filters user can select one of the human-readable options from dropdown. Phrase filter is a text input where we can type an arbitrary substring of a comment field of a product review and thus filter reviews containing this substring. When we add or remove a filter our charts are getting updated.
+We need to display 2 charts. One of them displays average sentiment with breakdown by category and another by theme. We recommend to use Highcharts JS to display these charts.
+
+### Backend requirements
+
+Besides API that your frontend needs you will need to implement one additional API endpoint that will be used by our clients to provide new reviews. This method creates a new review in your database and its request will contain a comment and themes with their sentiments. We will use this endpoint to populate your database with more reviews and test how your API performs for bigger datasets than the one we provided.
+
+Feel free to choose any API protocol that feels right to you for this task as well as any database.
+
+Keep in mind that one of the highest priorities for us is responsiveness of our charts because this is an analytical tool that will be used by our clients and they will be playing with different combinations of filters to find insights they need and they expect to see results right after updating the filter.
+
+Another obvious requirement is a durability of data - our clients rely on Chattermill in understanding of how their customers feel and we think every single customer should be heard. For us it means we need to reduce the probability of losing any events in our system to the bare minimum.
+
 ## General structure
 
 This application is composed of 4 components:
