@@ -1,4 +1,4 @@
-# Chattermill Code Challenge by Felipe Rodrigues
+# Full Stack Code Sample in Elixir by Felipe Rodrigues
 
 ## Requirements
 
@@ -28,7 +28,7 @@ Feel free to choose any API protocol that feels right to you for this task as we
 
 Keep in mind that one of the highest priorities for us is responsiveness of our charts because this is an analytical tool that will be used by our clients and they will be playing with different combinations of filters to find insights they need and they expect to see results right after updating the filter.
 
-Another obvious requirement is a durability of data - our clients rely on Chattermill in understanding of how their customers feel and we think every single customer should be heard. For us it means we need to reduce the probability of losing any events in our system to the bare minimum.
+Another obvious requirement is a durability of data - our clients rely on us in understanding of how their customers feel and we think every single customer should be heard. For us it means we need to reduce the probability of losing any events in our system to the bare minimum.
 
 ## General structure
 
